@@ -1,0 +1,169 @@
+# ============================================================
+#  PROGRAMA: Árbol Binario de Búsqueda con Visualización
+# ============================================================
+
+import matplotlib
+matplotlib.use('TkAgg')  # Fuerza backend gráfico para Windows / VSCode
+import matplotlib.pyplot as plt
+import networkx as nx
+
+
+# ============================================================
+# Clase Nodo
+# ============================================================
+class Nodo:
+    def __init__(self, valor):
+        self.valor = valor
+        self.izquierdo = None
+        self.derecho = None
+
+
+# ============================================================
+# Clase Árbol Binario
+# ============================================================
+class Arbol:
+    def __init__(self):
+        self.raiz = None
+
+    # [1] Insertar elemento
+    def insertar(self, valor):
+        if self.raiz is None:
+            self.raiz = Nodo(valor)
+        else:
+            self._insertar_rec(self.raiz, valor)
+
+    def _insertar_rec(self, nodo, valor):
+        if valor < nodo.valor:
+            if nodo.izquierdo is None:
+                nodo.izquierdo = Nodo(valor)
+            else:
+                self._insertar_rec(nodo.izquierdo, valor)
+        elif valor > nodo.valor:
+            if nodo.derecho is None:
+                nodo.derecho = Nodo(valor)
+            else:
+                self._insertar_rec(nodo.derecho, valor)
+        else:
+            print(f"El valor {valor} ya existe en el árbol.")
+
+    # [2] Mostrar árbol completo acostado (raíz a la izquierda)
+    def mostrar(self, nodo=None, nivel=0):
+        if nodo is None:
+            if nivel == 0:  # solo al inicio
+                nodo = self.raiz
+            else:
+                return  # evita recursión infinita
+
+        if nodo is not None:
+            self.mostrar(nodo.derecho, nivel + 1)
+            print('    ' * nivel + f'→ {nodo.valor}')
+            self.mostrar(nodo.izquierdo, nivel + 1)
+
+    # ========================================================
+    # Métodos para graficar el árbol
+    # ========================================================
+    def _crear_grafo(self, G, nodo):
+        if nodo is None:
+            return
+        G.add_node(nodo.valor)
+        if nodo.izquierdo:
+            G.add_edge(nodo.valor, nodo.izquierdo.valor)
+            self._crear_grafo(G, nodo.izquierdo)
+        if nodo.derecho:
+            G.add_edge(nodo.valor, nodo.derecho.valor)
+            self._crear_grafo(G, nodo.derecho)
+
+    # [3] Graficar árbol completo (sin necesidad de Graphviz)
+    def graficar(self):
+        if self.raiz is None:
+            print("Árbol vacío, no se puede graficar.")
+            return
+
+        G = nx.DiGraph()
+        self._crear_grafo(G, self.raiz)
+
+        # Layout automático (no requiere pygraphviz)
+        pos = nx.spring_layout(G)
+
+        plt.figure(figsize=(8, 6))
+        nx.draw(
+            G,
+            pos,
+            with_labels=True,
+            arrows=False,
+            node_size=2000,
+            node_color="lightblue",
+            font_size=10,
+            font_weight="bold"
+        )
+        plt.title("Árbol Binario de Búsqueda", fontsize=14)
+        plt.show()
+
+    # ========================================================
+    # [4] Buscar un elemento en el árbol
+    # ========================================================
+    def buscar(self, valor):
+        return self._buscar_rec(self.raiz, valor)
+
+    def _buscar_rec(self, nodo, valor):
+        if nodo is None:
+            return False
+        if nodo.valor == valor:
+            return True
+        elif valor < nodo.valor:
+            return self._buscar_rec(nodo.izquierdo, valor)
+        else:
+            return self._buscar_rec(nodo.derecho, valor)
+
+    # ========================================================
+    # [5] Recorridos básicos
+    # ========================================================
+    def preorden(self, nodo=None):
+        if nodo is None:
+            nodo = self.raiz
+        if nodo:
+            print(nodo.valor, end=' ')
+            self.preorden(nodo.izquierdo)
+            self.preorden(nodo.derecho)
+
+    def inorden(self, nodo=None):
+        if nodo is None:
+            nodo = self.raiz
+        if nodo:
+            self.inorden(nodo.izquierdo)
+            print(nodo.valor, end=' ')
+            self.inorden(nodo.derecho)
+
+    def postorden(self, nodo=None):
+        if nodo is None:
+            nodo = self.raiz
+        if nodo:
+            self.postorden(nodo.izquierdo)
+            self.postorden(nodo.derecho)
+            print(nodo.valor, end=' ')
+
+
+# ============================================================
+# PROGRAMA PRINCIPAL
+# ============================================================
+if __name__ == "__main__":
+    A = Arbol()
+
+    # Insertar valores de ejemplo
+    for n in [50, 30, 70, 20, 40, 60, 80]:
+        A.insertar(n)
+
+    print("\n[2] Árbol acostado:")
+    A.mostrar()
+
+    print("\n[3] Graficando árbol...")
+    A.graficar()
+
+    print("\n[5] Recorrido InOrden:")
+    A.inorden()
+
+    print("\n\n[4] Buscar elemento:")
+    x = 60
+    print(f"¿Existe {x}? {'Sí' if A.buscar(x) else 'No'}")
+
+    input("\nPresiona ENTER para salir...")
