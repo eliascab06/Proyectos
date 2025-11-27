@@ -1,0 +1,74 @@
+def burbuja(lista):
+    n = len(lista)
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if lista[j] > lista[j + 1]:
+                lista[j], lista[j + 1] = lista[j + 1], lista[j]
+    return lista
+
+def insercion(lista):
+    for i in range(1, len(lista)):
+        actual = lista[i]
+        j = i - 1
+        while j >= 0 and lista[j] > actual:
+            lista[j + 1] = lista[j]
+            j -= 1
+        lista[j + 1] = actual
+    return lista
+
+def seleccion(lista):
+    n = len(lista)
+    for i in range(n):
+        indice_menor = i
+        for j in range(i + 1, n):
+            if lista[j] < lista[indice_menor]:
+                indice_menor = j
+        lista[i], lista[indice_menor] = lista[indice_menor], lista[i]
+    return lista
+
+def pedir_lista():
+    print("\nIngresa los valores separados por comas (ejemplo: 10,4,2,8):")
+    entrada = input("→ ")
+    try:
+        lista = [float(x.strip()) for x in entrada.split(",")]
+        return lista
+    except:
+        print("❌ Entrada inválida. Inténtalo nuevamente.")
+        return pedir_lista()
+
+def menu():
+    while True:
+        print("\n==============================")
+        print("    MÉTODOS DE ORDENAMIENTO   ")
+        print("==============================")
+        print("1. Ordenamiento Burbuja")
+        print("2. Ordenamiento por Inserción")
+        print("3. Ordenamiento por Selección")
+        print("4. Salir")
+        
+        opcion = input("Elige una opción: ")
+
+        if opcion == "1":
+            lista = pedir_lista()
+            print("\nOrdenando con Burbuja...")
+            print("Resultado:", burbuja(lista))
+
+        elif opcion == "2":
+            lista = pedir_lista()
+            print("\nOrdenando con Inserción...")
+            print("Resultado:", insercion(lista))
+
+        elif opcion == "3":
+            lista = pedir_lista()
+            print("\nOrdenando con Selección...")
+            print("Resultado:", seleccion(lista))
+
+        elif opcion == "4":
+            print("\n¡Hasta luego! 👋")
+            break
+
+        else:
+            print("❌ Opción inválida. Intenta nuevamente.")
+
+# Ejecución del programa
+menu()
